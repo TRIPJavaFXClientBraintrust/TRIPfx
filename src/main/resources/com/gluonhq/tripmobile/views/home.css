@@ -1,0 +1,25 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.root {
+
+}
+
+.title {
+    -fx-font-size: 2.5em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -primary-swatch-700;
+    -fx-effect: dropshadow(gaussian, black, 2, 0, 0, 1);
+}
+
+.subtitle {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+.authors {
+    -fx-text-fill: -primary-swatch-900;
+    -fx-font-size: 1.1em;
+    -fx-font-weight: bold;
+}

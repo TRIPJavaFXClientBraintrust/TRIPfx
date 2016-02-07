@@ -1,0 +1,29 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.root {
+
+}
+
+.flow {
+    -fx-background-color: -primary-swatch-300;
+}
+
+.compassTitle {
+    -fx-text-fill: -primary-swatch-900;
+    -fx-font-size: 1.2em;
+}
+.compassValue {
+    -fx-text-fill: -primary-swatch-800;
+    -fx-font-size: 1.5em;
+}
+
+.foot {
+    -fx-background-color: -primary-swatch-300;
+}
+
+.foot .label {
+    -fx-font-size: 0.8em;
+    -fx-text-fill: -primary-swatch-700;
+}
