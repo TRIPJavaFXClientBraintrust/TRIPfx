@@ -1,0 +1,16 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.view {
+    -fx-background-color: -primary-swatch-300;
+    
+}
+
+.image {
+    -fx-effect: -elevation-z2;
+}
+
+.grid {
+    -fx-effect: -elevation-z2;
+}
