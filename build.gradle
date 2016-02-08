@@ -1,0 +1,41 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.javafxports:jfxmobile-plugin:1.0.7'
+    }
+}
+
+apply plugin: 'org.javafxports.jfxmobile'
+
+repositories {
+    jcenter()
+    maven {
+        url 'http://nexus.gluonhq.com/nexus/content/repositories/releases/'
+    }
+}
+
+ext.GLUON_VERSION = "2.0.0"
+
+dependencies {
+    compile "com.gluonhq:charm:$GLUON_VERSION"
+    compile "com.airhacks:afterburner.mfx:1.6.2"
+    compile files('libs/medusa-3.5.jar')
+    desktopRuntime "com.gluonhq:charm-desktop:$GLUON_VERSION"
+    androidRuntime "com.gluonhq:charm-android:$GLUON_VERSION"
+    iosRuntime "com.gluonhq:charm-ios:$GLUON_VERSION"
+} 
+
+mainClassName = 'com.gluonhq.tripmobile.TRIPMobile'
+
+jfxmobile {
+    android {
+        manifest = 'src/android/AndroidManifest.xml'
+    }
+    ios {
+        infoPList = file('src/ios/Default-Info.plist')
+        forceLinkClasses = ['com.gluonhq.**.*']
+    }
+}
+
