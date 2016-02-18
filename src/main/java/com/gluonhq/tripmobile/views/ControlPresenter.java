@@ -66,6 +66,7 @@ public class ControlPresenter {
 
     public void initialize() {
 
+        // Connect to the GroundControl server
         try {
             container.connectToServer(endpoint, new URI("ws://localhost:8081/control"));
         } catch (DeploymentException | IOException | URISyntaxException ex) {
