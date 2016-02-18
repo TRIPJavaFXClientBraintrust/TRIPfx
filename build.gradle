@@ -1,9 +1,11 @@
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'org.javafxports:jfxmobile-plugin:1.0.7'
+        classpath 'javax.websocket:javax.websocket-client-api:1.0-b14'
     }
 }
 
@@ -11,6 +13,7 @@ apply plugin: 'org.javafxports.jfxmobile'
 
 repositories {
     jcenter()
+    mavenCentral()
     maven {
         url 'http://nexus.gluonhq.com/nexus/content/repositories/releases/'
     }
@@ -25,7 +28,9 @@ dependencies {
     desktopRuntime "com.gluonhq:charm-desktop:$GLUON_VERSION"
     androidRuntime "com.gluonhq:charm-android:$GLUON_VERSION"
     iosRuntime "com.gluonhq:charm-ios:$GLUON_VERSION"
-} 
+    compile "javax.websocket:javax.websocket-client-api:1.0-b14"
+    compile "org.glassfish.tyrus:tyrus-server:1.12"
+}
 
 mainClassName = 'com.gluonhq.tripmobile.TRIPMobile'
 
