@@ -6,6 +6,7 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.LifecycleEvent;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.gluonhq.tripmobile.websocketclient.MessageEndpoint;
 import eu.hansolo.medusa.FGauge;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.KnobType;
@@ -15,10 +16,17 @@ import eu.hansolo.medusa.Gauge.SkinType;
 import eu.hansolo.medusa.GaugeBuilder;
 import eu.hansolo.medusa.GaugeDesign;
 import eu.hansolo.medusa.LcdDesign;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
@@ -31,6 +39,11 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 
+import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
+import javax.websocket.EndpointConfig;
+import javax.websocket.WebSocketContainer;
+
 /**
  * FXML Controller class
  *
@@ -40,12 +53,12 @@ public class GaugesPresenter {
 
     @FXML
     private View gauges;
-    
+
     @FXML
     private GridPane gridPaneLeft;
     @FXML
     private GridPane gridPaneRight;
-    
+
     private final DoubleProperty temperature = new SimpleDoubleProperty();
     private final DoubleProperty humidity = new SimpleDoubleProperty();
     private final DoubleProperty radiation = new SimpleDoubleProperty();
@@ -53,11 +66,21 @@ public class GaugesPresenter {
     private final DoubleProperty distanceLeft = new SimpleDoubleProperty();
     private final DoubleProperty distanceRight = new SimpleDoubleProperty();
     private final DoubleProperty distanceForward = new SimpleDoubleProperty();
-    
+
+    private MessageEndpoint endpoint = new MessageEndpoint();
+    private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+
     public void initialize() {
-        
+
+        // Connect to the GroundControl server
+        try {
+            container.connectToServer(endpoint, new URI("ws://localhost:8081/data"));
+        } catch (DeploymentException | IOException | URISyntaxException ex) {
+            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         boolean animate = JavaFXPlatform.isDesktop();
-        
+
         final Color[] colors = LcdDesign.SECTIONS.getColors();
         final Color colorText = LcdDesign.SECTIONS.lcdForegroundColor;
         final LinearGradient linearGradient = new LinearGradient(0, 0, 0, 1,
@@ -72,7 +95,7 @@ public class GaugesPresenter {
                 new Stop(0.50, Color.TEAL),
                 new Stop(0.75, Color.TEAL.darker()),
                 new Stop(1.00, Color.TEAL.darker().darker()));
-        
+
         Gauge gaugeTemp = GaugeBuilder.create()
                              .skinType(SkinType.DASHBOARD)
                              .backgroundPaint(Color.web("#4DB6AC"))
@@ -92,7 +115,7 @@ public class GaugesPresenter {
                              .gradientBarStops(stops)
                              .value(-15)
                              .build();
-        
+
         Gauge gaugeHum = GaugeBuilder.create()
                              .skinType(SkinType.DASHBOARD)
                              .backgroundPaint(Color.web("#4DB6AC"))
@@ -110,7 +133,7 @@ public class GaugesPresenter {
                              .gradientBarEnabled(true)
                              .gradientBarStops(stops)
                              .build();
-        
+
         Gauge gaugeRad = GaugeBuilder.create()
                              .skinType(SkinType.DASHBOARD)
                              .backgroundPaint(Color.web("#4DB6AC"))
@@ -128,7 +151,7 @@ public class GaugesPresenter {
                              .gradientBarEnabled(true)
                              .gradientBarStops(stops)
                              .build();
-        
+
         Gauge gaugeDir = GaugeBuilder.create()
                             .prefSize(400, 400)
                             .borderPaint(Color.TEAL.darker())
@@ -147,7 +170,7 @@ public class GaugesPresenter {
                             .customTickLabelFontSize(48)
                             .knobType(KnobType.FLAT)
                             .knobColor(Color.TEAL.darker())
-                            .needleShape(NeedleShape.FLAT)                            
+                            .needleShape(NeedleShape.FLAT)
                             .needleType(NeedleType.FAT)
                             .needleColor(Color.TEAL.darker())
                             .tickLabelColor(Color.TEAL.darker())
@@ -157,12 +180,12 @@ public class GaugesPresenter {
                             .needleBehavior(Gauge.NeedleBehavior.OPTIMIZED)
                             .build();
         FGauge framedGaugeDir = new FGauge(gaugeDir, GaugeDesign.METAL, GaugeDesign.GaugeBackground.ANTHRACITE);
-                            
+
         Label compassTitle = new Label("Direction");
         compassTitle.getStyleClass().add("compassTitle");
         compassTitle.setAlignment(Pos.CENTER);
         compassTitle.setPrefWidth(400);
-        
+
         Label compassValue = new Label("0°");
         compassValue.getStyleClass().add("compassValue");
         compassValue.setAlignment(Pos.CENTER);
@@ -171,7 +194,7 @@ public class GaugesPresenter {
             compassValue.setText(String.format(Locale.US, "%.0f°", gaugeDir.getValue()));
         });
         VBox pane4 = new VBox(framedGaugeDir, compassValue, compassTitle);
-        
+
         Gauge gaugeDistFo = GaugeBuilder.create()
                               .skinType(SkinType.LCD)
                               .animated(animate)
@@ -184,7 +207,7 @@ public class GaugesPresenter {
                               .maxValue(Double.MAX_VALUE)
                               .threshold(Double.MAX_VALUE)
                               .build();
-        
+
         Gauge gaugeDistLe = GaugeBuilder.create()
                               .skinType(SkinType.LCD)
                               .animated(animate)
@@ -197,7 +220,7 @@ public class GaugesPresenter {
                               .maxValue(Double.MAX_VALUE)
                               .threshold(Double.MAX_VALUE)
                               .build();
-        
+
         Gauge gaugeDistRi = GaugeBuilder.create()
                               .skinType(SkinType.LCD)
                               .animated(animate)
@@ -210,16 +233,16 @@ public class GaugesPresenter {
                               .maxValue(Double.MAX_VALUE)
                               .threshold(Double.MAX_VALUE)
                               .build();
-        
+
         gridPaneLeft.add(gaugeTemp, 0, 0);
         gridPaneLeft.add(gaugeHum, 0, 1);
         gridPaneLeft.add(gaugeRad, 0, 2);
-            
+
         gridPaneRight.add(pane4, 0, 0);
         gridPaneRight.add(gaugeDistFo, 0, 1);
         gridPaneRight.add(gaugeDistLe, 0, 2);
         gridPaneRight.add(gaugeDistRi, 0, 3);
-        
+
         gauges.showingProperty().addListener((obs, ov, nv) -> {
             if (nv) {
                 AppBar appBar = MobileApplication.getInstance().getAppBar();
@@ -234,11 +257,11 @@ public class GaugesPresenter {
                         distanceLeft.set(new Random().nextDouble() * 500);
                         distanceRight.set(new Random().nextDouble() * 500);
                         distanceForward.set(new Random().nextDouble() * 500);
-                    }), 
+                    }),
                     MaterialDesignIcon.STOP.button());
             }
         });
-        
+
         temperature.addListener((obs, ov, nv) -> gaugeTemp.setValue(nv.doubleValue()));
         humidity.addListener((obs, ov, nv) -> gaugeHum.setValue(nv.doubleValue()));
         radiation.addListener((obs, ov, nv) -> gaugeRad.setValue(nv.doubleValue()));
@@ -246,7 +269,7 @@ public class GaugesPresenter {
         distanceForward.addListener((obs, ov, nv) -> gaugeDistFo.setValue(nv.doubleValue()));
         distanceLeft.addListener((obs, ov, nv) -> gaugeDistLe.setValue(nv.doubleValue()));
         distanceRight.addListener((obs, ov, nv) -> gaugeDistRi.setValue(nv.doubleValue()));
-        
+
         gauges.addEventHandler(LifecycleEvent.HIDDEN, e -> {
             gaugeTemp.stop();
             gaugeHum.stop();
@@ -256,33 +279,35 @@ public class GaugesPresenter {
             gaugeDistLe.stop();
             gaugeDistRi.stop();
         });
-    }    
-    
+    }
+
     public DoubleProperty temperatureProperty() {
         return temperature;
     }
- 
+
     public DoubleProperty humidityProperty() {
         return humidity;
     }
-    
+
     public DoubleProperty radiationProperty() {
         return radiation;
     }
-    
+
     public DoubleProperty directionProperty() {
         return direction;
     }
-    
+
     public DoubleProperty distanceLeftProperty() {
         return distanceLeft;
     }
-    
+
     public DoubleProperty distanceRightProperty() {
         return distanceRight;
     }
-    
+
     public DoubleProperty distanceForwardProperty() {
         return distanceForward;
     }
+
+
 }
