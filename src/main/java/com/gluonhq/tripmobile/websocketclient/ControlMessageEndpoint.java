@@ -15,14 +15,18 @@ import javax.websocket.Session;
  *
  * @author mark
  */
-public class MessageEndpoint extends Endpoint {
+public class ControlMessageEndpoint extends Endpoint {
   private Session session;
 
   @Override
   public void onOpen(Session sn, EndpointConfig ec) {
+    System.out.println("In ControlMessageEndpoint#onOpen");
     this.session = sn;
-    this.session.addMessageHandler((MessageHandler.Whole<String>) (String t) -> {
-      System.out.println("Message = " + t);
+
+    this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+      public void onMessage(String text) {
+        System.out.println("Got your message (" + text + "). Thanks !");
+      }
     });
   }
 
@@ -33,9 +37,10 @@ public class MessageEndpoint extends Endpoint {
 
   public void sendMessage(String message) {
     try {
+      System.out.println("sendMessage message = " + message);
       this.session.getBasicRemote().sendText(message);
     } catch (IOException ex) {
-      Logger.getLogger(MessageEndpoint.class.getName()).log(Level.SEVERE, null, ex);
+      Logger.getLogger(ControlMessageEndpoint.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
 }

@@ -37,5 +37,9 @@
     <orderEntry type="library" exported="" name="Gradle: org.glassfish:javax.json:1.0.4" level="project" />
     <orderEntry type="library" exported="" name="Gradle: io.datafx:core:8.0.1" level="project" />
     <orderEntry type="library" exported="" name="javax.websocket:javax.websocket-client-api:1.0-b14" level="project" />
+    <orderEntry type="library" name="jackson-xml-databind-0.6.2" level="project" />
+    <orderEntry type="library" name="jackson-databind-2.5.4" level="project" />
+    <orderEntry type="library" name="jackson-databind-2.7.1-1" level="project" />
+    <orderEntry type="library" name="jackson-core-2.7.1" level="project" />
   </component>
 </module>

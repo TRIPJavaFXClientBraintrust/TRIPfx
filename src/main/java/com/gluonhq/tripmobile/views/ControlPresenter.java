@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.gluonhq.tripmobile.websocketclient.MessageEndpoint;
+import com.gluonhq.tripmobile.websocketclient.ControlMessageEndpoint;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -61,7 +61,7 @@ public class ControlPresenter {
     private ScheduledFuture<?> schedulerCam = null;
     private Camera camFeed;
 
-    private MessageEndpoint endpoint = new MessageEndpoint();
+    private ControlMessageEndpoint endpoint = new ControlMessageEndpoint();
     private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 
     public void initialize() {

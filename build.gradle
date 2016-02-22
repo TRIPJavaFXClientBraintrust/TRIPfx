@@ -6,6 +6,9 @@ buildscript {
     dependencies {
         classpath 'org.javafxports:jfxmobile-plugin:1.0.7'
         classpath 'javax.websocket:javax.websocket-client-api:1.0-b14'
+        classpath 'com.fasterxml.jackson.core:jackson-core:2.7.1'
+        classpath 'com.fasterxml.jackson.core:jackson-databind:2.7.1-1'
+
     }
 }
 
@@ -30,6 +33,8 @@ dependencies {
     iosRuntime "com.gluonhq:charm-ios:$GLUON_VERSION"
     compile "javax.websocket:javax.websocket-client-api:1.0-b14"
     compile "org.glassfish.tyrus:tyrus-server:1.12"
+    compile 'com.fasterxml.jackson.core:jackson-core:2.7.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.1-1'
 }
 
 mainClassName = 'com.gluonhq.tripmobile.TRIPMobile'

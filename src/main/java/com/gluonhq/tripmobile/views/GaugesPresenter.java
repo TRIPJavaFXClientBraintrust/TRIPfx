@@ -6,7 +6,10 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.LifecycleEvent;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
-import com.gluonhq.tripmobile.websocketclient.MessageEndpoint;
+import com.gluonhq.tripmobile.model.Reading;
+import com.gluonhq.tripmobile.model.ReadingConsumer;
+import com.gluonhq.tripmobile.websocketclient.ControlMessageEndpoint;
+import com.gluonhq.tripmobile.websocketclient.DataMessageEndpoint;
 import eu.hansolo.medusa.FGauge;
 import eu.hansolo.medusa.Gauge;
 import eu.hansolo.medusa.Gauge.KnobType;
@@ -41,7 +44,6 @@ import javafx.scene.paint.Stop;
 
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
-import javax.websocket.EndpointConfig;
 import javax.websocket.WebSocketContainer;
 
 /**
@@ -49,7 +51,7 @@ import javax.websocket.WebSocketContainer;
  *
  * @author JosePereda
  */
-public class GaugesPresenter {
+public class GaugesPresenter implements ReadingConsumer {
 
     @FXML
     private View gauges;
@@ -67,8 +69,19 @@ public class GaugesPresenter {
     private final DoubleProperty distanceRight = new SimpleDoubleProperty();
     private final DoubleProperty distanceForward = new SimpleDoubleProperty();
 
-    private MessageEndpoint endpoint = new MessageEndpoint();
+    private DataMessageEndpoint endpoint = new DataMessageEndpoint(this);
     private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+
+    @Override
+    public void setReading(Reading reading) {
+        temperature.set(reading.getTemp());
+        humidity.set(reading.getHum());
+        radiation.set(reading.getCpm());
+        direction.set(reading.getHeading());
+        distanceLeft.set(reading.getDistLeft());
+        distanceRight.set(reading.getDistRight());
+        distanceForward.set(reading.getDistForward());
+    }
 
     public void initialize() {
 
