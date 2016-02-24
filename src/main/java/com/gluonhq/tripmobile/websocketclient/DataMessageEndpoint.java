@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gluonhq.tripmobile.model.Reading;
 import com.gluonhq.tripmobile.model.ReadingConsumer;
+import javafx.application.Platform;
 
 /**
  *
@@ -40,7 +41,7 @@ public class DataMessageEndpoint extends Endpoint {
           ObjectMapper mapper = new ObjectMapper();
           Reading reading = mapper.readValue(jsonReading, Reading.class);
           System.out.println("New reading: " + reading.toString());
-          readingConsumer.setReading(reading);
+          Platform.runLater(() -> readingConsumer.setReading(reading));
 
         }
         catch (Exception e) {

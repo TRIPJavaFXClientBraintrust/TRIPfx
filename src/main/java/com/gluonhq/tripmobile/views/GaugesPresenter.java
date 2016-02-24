@@ -8,7 +8,6 @@ import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.tripmobile.model.Reading;
 import com.gluonhq.tripmobile.model.ReadingConsumer;
-import com.gluonhq.tripmobile.websocketclient.ControlMessageEndpoint;
 import com.gluonhq.tripmobile.websocketclient.DataMessageEndpoint;
 import eu.hansolo.medusa.FGauge;
 import eu.hansolo.medusa.Gauge;
@@ -26,7 +25,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,13 +82,6 @@ public class GaugesPresenter implements ReadingConsumer {
     }
 
     public void initialize() {
-
-        // Connect to the GroundControl server
-        try {
-            container.connectToServer(endpoint, new URI("ws://localhost:8081/data"));
-        } catch (DeploymentException | IOException | URISyntaxException ex) {
-            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
         boolean animate = JavaFXPlatform.isDesktop();
 
@@ -263,13 +254,12 @@ public class GaugesPresenter implements ReadingConsumer {
                 appBar.setTitleText("Monitoring TRIP");
                 appBar.getActionItems().addAll(
                     MaterialDesignIcon.PLAY_ARROW.button(e -> {
-                        temperature.set(new Random().nextDouble() * 60 -15d);
-                        humidity.set(new Random().nextDouble() * 100);
-                        radiation.set(new Random().nextDouble() * 500);
-                        direction.set(new Random().nextDouble() * 360);
-                        distanceLeft.set(new Random().nextDouble() * 500);
-                        distanceRight.set(new Random().nextDouble() * 500);
-                        distanceForward.set(new Random().nextDouble() * 500);
+                        // Connect to the GroundControl server
+                        try {
+                            container.connectToServer(endpoint, new URI("ws://192.168.1.15:8080/data"));
+                        } catch (DeploymentException | IOException | URISyntaxException ex) {
+                            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }),
                     MaterialDesignIcon.STOP.button());
             }
