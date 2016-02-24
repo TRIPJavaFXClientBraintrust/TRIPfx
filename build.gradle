@@ -1,13 +1,9 @@
 buildscript {
     repositories {
         jcenter()
-        mavenCentral()
     }
     dependencies {
         classpath 'org.javafxports:jfxmobile-plugin:1.0.7'
-        classpath 'javax.websocket:javax.websocket-client-api:1.0-b14'
-        classpath 'com.fasterxml.jackson.core:jackson-core:2.7.1'
-        classpath 'com.fasterxml.jackson.core:jackson-databind:2.7.1-1'
 
     }
 }
@@ -22,7 +18,7 @@ repositories {
     }
 }
 
-ext.GLUON_VERSION = "2.0.0"
+ext.GLUON_VERSION = "2.0.1"
 
 dependencies {
     compile "com.gluonhq:charm:$GLUON_VERSION"
@@ -31,10 +27,10 @@ dependencies {
     desktopRuntime "com.gluonhq:charm-desktop:$GLUON_VERSION"
     androidRuntime "com.gluonhq:charm-android:$GLUON_VERSION"
     iosRuntime "com.gluonhq:charm-ios:$GLUON_VERSION"
-    compile "javax.websocket:javax.websocket-client-api:1.0-b14"
-    compile "org.glassfish.tyrus:tyrus-server:1.12"
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.1-1'
+    // see https://github.com/pavelbucek/tyrus-client-android-test
+    compile "org.glassfish.tyrus.bundles:tyrus-standalone-client:1.12"
 }
 
 mainClassName = 'com.gluonhq.tripmobile.TRIPMobile'
@@ -42,10 +38,19 @@ mainClassName = 'com.gluonhq.tripmobile.TRIPMobile'
 jfxmobile {
     android {
         manifest = 'src/android/AndroidManifest.xml'
+        packagingOptions {
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/MANIFEST.MF'
+            exclude 'META-INF/NOTICE'
+        }
     }
     ios {
         infoPList = file('src/ios/Default-Info.plist')
-        forceLinkClasses = ['com.gluonhq.**.*']
+        forceLinkClasses = ['com.gluonhq.**.*', 
+                            'org.glassfish.**.*',
+                            'com.fasterxml.**.*',
+                            'javafx.websocket.**.*',
+                            'eu.hansolo.**.*']
     }
 }
 
