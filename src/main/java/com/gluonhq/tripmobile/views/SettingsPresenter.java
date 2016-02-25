@@ -39,16 +39,16 @@ public class SettingsPresenter {
         configuration.cameraPortProperty().addListener((obs, ov, nv) -> updateService());
         
         final DefaultOption<String> dataIpOption = new DefaultOption(MaterialDesignIcon.WEB.graphic(),
-                "Data IP", "Set the data' IP", null, configuration.dataIpProperty(), true);
+                "Data IP", "Set the data IP", null, configuration.dataIpProperty(), true);
         
         final DefaultOption<String> dataPortOption = new DefaultOption(MaterialDesignIcon.WEB.graphic(),
-                "Data Port", "Set the data' Port", null, configuration.dataPortProperty(), true);
+                "Data Port", "Set the data Port", null, configuration.dataPortProperty(), true);
         
         final DefaultOption<String> controlIpOption = new DefaultOption(MaterialDesignIcon.CONTROL_POINT.graphic(),
-                "Control IP", "Set the control' IP", null, configuration.controlIpProperty(), true);
+                "Control IP", "Set the control IP", null, configuration.controlIpProperty(), true);
         
         final DefaultOption<String> controlPortOption = new DefaultOption(MaterialDesignIcon.CONTROL_POINT.graphic(),
-                "Control Port", "Set the control' Port", null, configuration.controlPortProperty(), true);
+                "Control Port", "Set the control Port", null, configuration.controlPortProperty(), true);
         
         final DefaultOption<String> cameraIpOption = new DefaultOption(MaterialDesignIcon.CAMERA_ALT.graphic(),
                 "Camera IP", "Set the camera's IP", null, configuration.cameraIpProperty(), true);
