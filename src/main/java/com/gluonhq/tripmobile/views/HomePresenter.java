@@ -5,6 +5,7 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.CardPane;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.gluonhq.tripmobile.Service;
 import static com.gluonhq.tripmobile.TRIPMobile.MENU_LAYER;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -14,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javax.inject.Inject;
 
 /**
  * FXML Controller class
@@ -22,6 +24,9 @@ import javafx.scene.layout.VBox;
  */
 public class HomePresenter {
 
+    @Inject 
+    private Service service;
+    
     @FXML
     private View home;
     
@@ -59,5 +64,9 @@ public class HomePresenter {
         });
         
     }    
+    
+    public void postInit() {
+        service.retrieveSettings();
+    }
     
 }

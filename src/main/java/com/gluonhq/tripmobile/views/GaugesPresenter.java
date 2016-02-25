@@ -6,6 +6,7 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.LifecycleEvent;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.gluonhq.tripmobile.Service;
 import com.gluonhq.tripmobile.model.Reading;
 import com.gluonhq.tripmobile.model.ReadingConsumer;
 import com.gluonhq.tripmobile.websocketclient.DataMessageEndpoint;
@@ -39,6 +40,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
+import javax.inject.Inject;
 
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
@@ -51,13 +53,12 @@ import javax.websocket.WebSocketContainer;
  */
 public class GaugesPresenter implements ReadingConsumer {
 
-    @FXML
-    private View gauges;
+    @Inject private Service service;
+    
+    @FXML private View gauges;
 
-    @FXML
-    private GridPane gridPaneLeft;
-    @FXML
-    private GridPane gridPaneRight;
+    @FXML private GridPane gridPaneLeft;
+    @FXML private GridPane gridPaneRight;
 
     private final DoubleProperty temperature = new SimpleDoubleProperty();
     private final DoubleProperty humidity = new SimpleDoubleProperty();
@@ -67,8 +68,8 @@ public class GaugesPresenter implements ReadingConsumer {
     private final DoubleProperty distanceRight = new SimpleDoubleProperty();
     private final DoubleProperty distanceForward = new SimpleDoubleProperty();
 
-    private DataMessageEndpoint endpoint = new DataMessageEndpoint(this);
-    private WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+    private final DataMessageEndpoint endpoint = new DataMessageEndpoint(this);
+    private final WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 
     @Override
     public void setReading(Reading reading) {
@@ -256,7 +257,7 @@ public class GaugesPresenter implements ReadingConsumer {
                     MaterialDesignIcon.PLAY_ARROW.button(e -> {
                         // Connect to the GroundControl server
                         try {
-                            container.connectToServer(endpoint, new URI("ws://192.168.1.15:8080/data"));
+                            container.connectToServer(endpoint, new URI(service.settingsProperty().get().getDataURL()));
                         } catch (DeploymentException | IOException | URISyntaxException ex) {
                             Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
                         }

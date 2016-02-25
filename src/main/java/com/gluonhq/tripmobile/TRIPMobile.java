@@ -1,5 +1,6 @@
 package com.gluonhq.tripmobile;
 
+import com.gluonhq.tripmobile.views.SettingsView;
 import com.gluonhq.charm.down.common.JavaFXPlatform;
 import com.gluonhq.charm.down.common.PlatformFactory;
 import com.gluonhq.charm.glisten.application.MobileApplication;
@@ -12,8 +13,8 @@ import com.gluonhq.charm.glisten.visual.Swatch;
 import com.gluonhq.tripmobile.views.ControlPresenter;
 import com.gluonhq.tripmobile.views.ControlView;
 import com.gluonhq.tripmobile.views.GaugesView;
+import com.gluonhq.tripmobile.views.HomePresenter;
 import com.gluonhq.tripmobile.views.HomeView;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -27,11 +28,11 @@ public class TRIPMobile extends MobileApplication {
 
     public static final String GAUGES_VIEW = "Gauges";
     public static final String CONTROL_VIEW = "Control";
+    public static final String SETTINGS_VIEW = "Settings";
     public static final String MENU_LAYER = "Menu";
     
-    public static final String CAMERA_IP = "http://192.168.1.50:8090";
-    
     private ControlPresenter controlPresenter;
+    private HomePresenter homePresenter;
     
     private final ChangeListener listener = (o, oldItem, newItem) -> {
                     hideLayer(MENU_LAYER);
@@ -40,8 +41,13 @@ public class TRIPMobile extends MobileApplication {
         
     @Override
     public void init() {
-        addViewFactory(HOME_VIEW, () -> (View)new HomeView().getView());
-        addViewFactory(GAUGES_VIEW, () -> (View)new GaugesView().getView());
+        addViewFactory(HOME_VIEW, () -> {
+            HomeView homeView = new HomeView();
+            homePresenter = (HomePresenter) homeView.getPresenter();
+            return (View) homeView.getView();
+        });
+        addViewFactory(GAUGES_VIEW, () -> (View) new GaugesView().getView());
+        addViewFactory(SETTINGS_VIEW, () -> (View) new SettingsView().getView());
         addViewFactory(CONTROL_VIEW, () -> {
             ControlView controlView = new ControlView();
             controlPresenter = (ControlPresenter) controlView.getPresenter();
@@ -59,7 +65,8 @@ public class TRIPMobile extends MobileApplication {
         navigationDrawer.getItems().setAll(
             new NavigationDrawer.Item(HOME_VIEW, MaterialDesignIcon.HOME.graphic()),
             new NavigationDrawer.Item(GAUGES_VIEW, MaterialDesignIcon.NETWORK_CHECK.graphic()),
-            new NavigationDrawer.Item(CONTROL_VIEW, MaterialDesignIcon.DIRECTIONS.graphic()));
+            new NavigationDrawer.Item(CONTROL_VIEW, MaterialDesignIcon.DIRECTIONS.graphic()),
+            new NavigationDrawer.Item(SETTINGS_VIEW, MaterialDesignIcon.SETTINGS.graphic()));
         
         addLayerFactory(MENU_LAYER, () -> new SidePopupView(navigationDrawer));
         viewProperty().addListener((obs, ov, nv) -> {
@@ -86,6 +93,8 @@ public class TRIPMobile extends MobileApplication {
             scene.getWindow().setWidth(350);
             scene.getWindow().setHeight(650);
         }
+        
+        homePresenter.postInit();
         
         PlatformFactory.getPlatform().setOnLifecycleEvent(p -> {
             if (controlPresenter != null) {
