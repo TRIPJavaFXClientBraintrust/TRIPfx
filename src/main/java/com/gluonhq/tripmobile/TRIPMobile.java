@@ -1,5 +1,6 @@
 package com.gluonhq.tripmobile;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.gluonhq.tripmobile.views.SettingsView;
 import com.gluonhq.charm.down.common.JavaFXPlatform;
 import com.gluonhq.charm.down.common.PlatformFactory;
@@ -94,13 +95,11 @@ public class TRIPMobile extends MobileApplication {
             scene.getWindow().setHeight(650);
         }
         
-        homePresenter.postInit();
-        
         PlatformFactory.getPlatform().setOnLifecycleEvent(p -> {
             if (controlPresenter != null) {
                 switch (p) {
                     case PAUSE: 
-                    case STOP: controlPresenter.stop(); break;
+                    case STOP: stop(); break;
                     case RESUME: controlPresenter.start(); break;
                 }
             }
@@ -110,9 +109,7 @@ public class TRIPMobile extends MobileApplication {
     
     @Override
     public void stop() {
-        if (controlPresenter != null) {
-            controlPresenter.stop();
-        }
+        Injector.forgetAll();
     }
     
 }

@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.javafxports:jfxmobile-plugin:1.0.7'
+        classpath 'org.javafxports:jfxmobile-plugin:1.0.9'
 
     }
 }
@@ -18,15 +18,17 @@ repositories {
     }
 }
 
-ext.GLUON_VERSION = "2.0.1"
+ext.GLUON_VERSION = "3.0.0"
 
 dependencies {
     compile "com.gluonhq:charm:$GLUON_VERSION"
     compile "com.airhacks:afterburner.mfx:1.6.2"
-    compile files('libs/medusa-3.5.jar')
+    compile files('libs/medusa-5.8.jar')
     desktopRuntime "com.gluonhq:charm-desktop:$GLUON_VERSION"
     androidRuntime "com.gluonhq:charm-android:$GLUON_VERSION"
     iosRuntime "com.gluonhq:charm-ios:$GLUON_VERSION"
+    
+    // websockets
     compile 'com.fasterxml.jackson.core:jackson-core:2.7.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.7.1-1'
     // see https://github.com/pavelbucek/tyrus-client-android-test

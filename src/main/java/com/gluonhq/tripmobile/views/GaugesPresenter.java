@@ -40,10 +40,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
+import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 /**
@@ -70,6 +73,7 @@ public class GaugesPresenter implements ReadingConsumer {
 
     private final DataMessageEndpoint endpoint = new DataMessageEndpoint(this);
     private final WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+    private Session connectToServer;
 
     @Override
     public void setReading(Reading reading) {
@@ -254,15 +258,8 @@ public class GaugesPresenter implements ReadingConsumer {
                 appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> MobileApplication.getInstance().goHome()));
                 appBar.setTitleText("Monitoring TRIP");
                 appBar.getActionItems().addAll(
-                    MaterialDesignIcon.PLAY_ARROW.button(e -> {
-                        // Connect to the GroundControl server
-                        try {
-                            container.connectToServer(endpoint, new URI(service.settingsProperty().get().getDataURL()));
-                        } catch (DeploymentException | IOException | URISyntaxException ex) {
-                            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }),
-                    MaterialDesignIcon.STOP.button());
+                    MaterialDesignIcon.PLAY_ARROW.button(e -> post()),
+                    MaterialDesignIcon.STOP.button(e -> stop()));
             }
         });
 
@@ -285,6 +282,32 @@ public class GaugesPresenter implements ReadingConsumer {
         });
     }
 
+    @PostConstruct
+    private void post() {
+        // Connect to the GroundControl server
+        try {
+            if (connectToServer != null) {
+                connectToServer.close();
+            }
+            System.out.println("new connection");
+            connectToServer = container.connectToServer(endpoint, new URI(service.settingsProperty().get().getDataURL()));
+        } catch (DeploymentException | IOException | URISyntaxException ex) {
+            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    @PreDestroy
+    public void stop() {
+        try {
+            System.out.println("closing connection");
+            if (connectToServer != null) {
+                connectToServer.close();
+            }
+        } catch(IOException ex) {
+            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public DoubleProperty temperatureProperty() {
         return temperature;
     }
@@ -312,6 +335,5 @@ public class GaugesPresenter implements ReadingConsumer {
     public DoubleProperty distanceForwardProperty() {
         return distanceForward;
     }
-
 
 }

@@ -15,6 +15,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 /**
@@ -47,7 +49,7 @@ public class HomePresenter {
                 new ImageView(new Image(getClass().getResourceAsStream("icon_spring_cloud_services_cf@2x.png"), 64, 64, true, true)), 
                 new ImageView(new Image(getClass().getResourceAsStream("/icon.png"), 64, 64, true, true)));
         hBox.setAlignment(Pos.CENTER);
-        final Label labelAuthors = new Label("M. Heckler, J. Weaver & J.Pereda");
+        final Label labelAuthors = new Label("Mark Heckler & José Pereda");
         labelAuthors.getStyleClass().add("authors");
         VBox vBox2 = new VBox(20, hBox, labelAuthors);
         vBox2.setAlignment(Pos.CENTER);
@@ -65,7 +67,8 @@ public class HomePresenter {
         
     }    
     
-    public void postInit() {
+    @PostConstruct
+    private void postInit() {
         service.retrieveSettings();
     }
     

@@ -23,10 +23,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
+import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 /**
@@ -64,35 +67,19 @@ public class ControlPresenter {
 
     private final ControlMessageEndpoint endpoint = new ControlMessageEndpoint();
     private final WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+    private Session connectToServer;
 
     public void initialize() {
 
-        // Connect to the GroundControl server
-        try {
-            container.connectToServer(endpoint, new URI(service.settingsProperty().get().getControlURL()));
-        } catch (DeploymentException | IOException | URISyntaxException ex) {
-            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        imageView.setRotate(90);
         control.showingProperty().addListener((obs, ov, nv) -> {
             if (nv) {
                 AppBar appBar = MobileApplication.getInstance().getAppBar();
                 appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> MobileApplication.getInstance().goHome()));
                 appBar.setTitleText("TRIP Mobile ControlBoard");
-                appBar.getActionItems().add(MaterialDesignIcon.CAMERA.button(e -> {
-                    if (camFeed == null) {
-                        camFeed = new Camera(service.settingsProperty().get().getCameraURL());
-                        camFeed.getImageProperty().addListener(
-                            (obs1, ov1, nv1) -> Platform.runLater(() -> imageView.setImage(nv1)));
-                        camFeed.getHasImageProperty().addListener(
-                            (obs1, ov1, nv1) -> {
-                                if (!nv1) {
-                                    Platform.runLater(() -> imageView.setImage(new Image(ControlPresenter.class.getResource("No_Image_Available.png").toExternalForm())));
-                                }
-                            });
-                        start();
-                    }
-                }));
+                appBar.getActionItems().addAll(
+                        MaterialDesignIcon.CAMERA.button(e -> start()),
+                        MaterialDesignIcon.STOP.button(e -> stop()));
             }
         });
 
@@ -118,20 +105,56 @@ public class ControlPresenter {
         });
     }
 
+    @PostConstruct
     public void start() {
+        System.out.println("Start camera");
+        if (camFeed == null) {
+            camFeed = new Camera(service.settingsProperty().get().getCameraURL());
+            camFeed.getImageProperty().addListener(
+                (obs, ov, nv) -> Platform.runLater(() -> imageView.setImage(nv)));
+            camFeed.getHasImageProperty().addListener(
+                (obs, ov, nv) -> {
+                    if (!nv) {
+                        Platform.runLater(() -> imageView.setImage(new Image(ControlPresenter.class.getResource("No_Image_Available.png").toExternalForm())));
+                    }
+                });
+        }
+        
         if (scheduler != null) {
             stop();
         }
         scheduler = Executors.newSingleThreadScheduledExecutor();
         schedulerCam = scheduler.scheduleAtFixedRate(camFeed, 0, 200, TimeUnit.MILLISECONDS);
+        
+        System.out.println("Start control");
+        // Connect to the GroundControl server
+        try {
+            if (connectToServer != null) {
+                connectToServer.close();
+            }
+            connectToServer = container.connectToServer(endpoint, new URI(service.settingsProperty().get().getControlURL()));
+        } catch (DeploymentException | IOException | URISyntaxException ex) {
+            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public void stop() {
+    @PreDestroy
+    private void stop() {
+        System.out.println("stop camera");
         if (schedulerCam != null) {
             schedulerCam.cancel(true);
         }
         if (scheduler != null) {
             scheduler.shutdown();
+        }
+        
+        try {
+            System.out.println("closing connection");
+            if (connectToServer != null) {
+                connectToServer.close();
+            }
+        } catch(IOException ex) {
+            Logger.getLogger(ControlPresenter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
